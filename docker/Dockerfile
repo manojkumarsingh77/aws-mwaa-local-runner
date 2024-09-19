@@ -6,6 +6,21 @@
 FROM amazonlinux:2023
 LABEL maintainer="amazon"
 
+# Add PySpark and Java for PySpark's Hadoop dependencies
+# Install Java (Amazon Corretto 11), tar, and curl, and then Apache Spark
+ARG SPARK_VERSION=3.4.0
+ARG HADOOP_VERSION=3
+
+RUN yum install -y java-11-amazon-corretto-devel tar curl gzip --allowerasing && \
+    curl -O https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz && \
+    tar xvf spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz && \
+    mv spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION} /opt/spark && \
+    rm spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
+
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$PATH:/opt/spark/bin:/opt/spark/sbin
+# Continue with your Airflow-related setup
+
 # Airflow
 ## Version specific ARGs
 ARG AIRFLOW_VERSION=2.9.2
